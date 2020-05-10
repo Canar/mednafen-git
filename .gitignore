@@ -1,0 +1,14 @@
+src/**/.deps
+src/**/.dirstamp
+src/**/*.o
+src/**/*.a
+**/Makefile
+config.log
+config.status
+include/config.h
+include/minilzo/
+include/stamp-h1
+include/trio/
+po/Makefile.in
+po/POTFILES
+src/mednafen
