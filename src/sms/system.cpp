@@ -25,7 +25,7 @@ namespace MDFN_IEN_SMS
 bitmap_t bitmap;
 input_t input;
 static int32 SoftResetCount;
-static unsigned sls, sle;
+static unsigned sls, sle, scs, sce;
 
 /* Run the virtual console emulation for one frame */
 void system_frame(int skip_render)
@@ -162,9 +162,9 @@ static void Emulate(EmulateSpecStruct *espec)
  }
  else
  {
-  espec->DisplayRect.x = 0;
+  espec->DisplayRect.x = scs;
   espec->DisplayRect.y = sls;
-  espec->DisplayRect.w = 256;
+  espec->DisplayRect.w = sce + 1 - scs;
   espec->DisplayRect.h = sle + 1 - sls;
  }
 
@@ -248,12 +248,20 @@ static void LoadCommon(GameFile* gf)
   {
    sls = MDFN_GetSettingUI((sms.display == DISPLAY_PAL) ? "sms.slstartp" : "sms.slstart");
    sle = MDFN_GetSettingUI((sms.display == DISPLAY_PAL) ? "sms.slendp" : "sms.slend");
+   scs = MDFN_GetSettingUI("sms.scstart");
+   sce = MDFN_GetSettingUI("sms.scend");
 
    if(sle < sls)
     std::swap(sls, sle);
 
+   if(sce < scs)
+    std::swap(sls, sle);
+
    MDFNGameInfo->lcm_height = sle + 1 - sls;
    MDFNGameInfo->nominal_height = sle + 1 - sls;
+
+   MDFNGameInfo->lcm_width = sce + 1 - scs;
+   MDFNGameInfo->nominal_width = sce + 1 - scs;
   }
 
   MDFNGameInfo->MasterClock = MDFN_MASTERCLOCK_FIXED(sndclk);
@@ -390,6 +398,9 @@ static const MDFNSetting SMSSettings[] =
 
  { "sms.slstartp", MDFNSF_NOFLAGS, gettext_noop("First displayed scanline in PAL mode."), NULL, MDFNST_UINT, "0", "0", "239" },
  { "sms.slendp", MDFNSF_NOFLAGS, gettext_noop("Last displayed scanline in PAL mode."), NULL, MDFNST_UINT, "239", "0", "239" },
+
+ { "sms.scstart", MDFNSF_NOFLAGS, gettext_noop("First displayed column."), NULL, MDFNST_UINT, "0", "0", "255" },
+ { "sms.scend", MDFNSF_NOFLAGS, gettext_noop("Last displayed column."), NULL, MDFNST_UINT, "255", "0", "255" },
 
  { NULL }
 };
